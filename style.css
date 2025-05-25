@@ -1,0 +1,39 @@
+.common-post-content-style {
+  line-height: 1.8;
+  background-color: #f9f9f9;
+  padding: 15px;
+  border-left: 4px solid #0073aa;
+}
+.post-title-style {
+  position: relative;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.post-title-style::before {
+  content: attr(data-label);
+  display: block;
+  padding: 4px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 2px;
+  position: absolute;
+  top: -1.5em;
+  right: 0%;
+  color: var(--titleColor, #000);
+  background-color: var(--titleBg, #fff);
+}
+
+.custom-post-box {
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.custom-post-box h2 {
+  margin-bottom: 10px;
+  font-size: 1.5rem;
+}
+
+
