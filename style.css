@@ -20,7 +20,7 @@
   margin-bottom: 2px;
   position: absolute;
   top: -1.5em;
-  right: 0%;
+  right: -25px;
   color: var(--titleColor, #000);
   background-color: var(--titleBg, #fff);
 }
