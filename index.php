@@ -6,7 +6,6 @@
  * Version: 1.0
  * Author: Abdulrahman AL-Attar
  * Text Domain: customize_title_and_content_posts
- * Domain Path: /languages
  */
 add_action('admin_menu', 'moot_attar_custom_posts_show_menu');
 
@@ -49,13 +48,16 @@ function get_schedule_data_callback()
     wp_send_json_success(['data' => $data]);
 }
 
-// تعديل the_title
 add_filter('the_title', 'custom_format_title');
 
 function custom_format_title($title)
 {
     if (is_admin() || !is_main_query() || !in_the_loop() || is_singular())
         return $title;
+    $is_rtl = 'left';
+    if (is_rtl()) {
+        $is_rtl = 'right';
+    }
     global $post;
     $data = get_option('custom_schedule_data', []);
     if (!is_array($data)) {
@@ -64,11 +66,11 @@ function custom_format_title($title)
     foreach ($data as $tag => $values) {
         extract($values);
         if (attar_has_current_tag($post->ID, $tag)) {
-            return '<span class="post-title-style" data-label="' . esc_attr($titleText) . '" style="--titleColor:' . esc_attr($titleColor) . '; --titleBg:' . esc_attr($titleBg) . ';">' . esc_html__($title, 'customize_title_and_content_posts') . '</span>';
+            return '<span class="attar-post-title-style-' . $is_rtl . '" data-label="' . esc_attr($titleText) . '" style="--titleColor:' . esc_attr($titleColor) . '; --titleBg:' . esc_attr($titleBg) . ';">' . esc_html__($title, 'customize_title_and_content_posts') . '</span>';
         }
     }
     if (is_post_new($post->ID))
-        return '<span class="post-title-style" data-label="' . esc_attr__('NEW', 'customize_title_and_content_posts') . '" style="--titleColor:' . esc_attr('#ffffff') . '; --titleBg:' . esc_attr('#f66151') . ';">' . esc_html__($title, 'customize_title_and_content_posts') . '</span>';
+        return '<span class="attar-post-title-style-' . $is_rtl . '" data-label="' . esc_attr__($is_rtl === 'right' ? 'جديد' : 'NEW', 'customize_title_and_content_posts') . '" style="--titleColor:' . esc_attr('#ffffff') . '; --titleBg:' . esc_attr('#f66151') . ';">' . esc_html__($title, 'customize_title_and_content_posts') . '</span>';
     return esc_html__($title, 'customize_title_and_content_posts');
 }
 
@@ -81,6 +83,51 @@ function attar_has_current_tag($post_id, $current_tag)
         }
     }
     return false;
+}
+
+add_filter('the_content', 'attar_custom_format_content_based_on_tags');
+
+function attar_custom_format_content_based_on_tags($content)
+{
+    if (!$content)
+        return $content;
+    $is_rtl = 'left';
+    if (is_rtl()) {
+        $is_rtl = 'right';
+    }
+    global $post;
+    $post_id = $post->ID;
+    if (is_admin() || is_singular() || !in_the_loop() || !is_main_query())
+        return $content;
+
+    $excerpt = has_excerpt($post_id) ? get_the_excerpt($post_id) : wp_trim_words(strip_tags($post->post_content), 3, '...');
+
+    $data = get_option('custom_schedule_data', []);
+    if (!is_array($data)) {
+        $data = [];
+    }
+    foreach ($data as $tag => $values) {
+        extract($values);
+        if (attar_has_current_tag($post->ID, $tag)) {
+            $custom_output = '
+            <div class="attar-custom-post-box-' . $is_rtl . '" style="--descBg:' . esc_attr(attar_lighten_hex_color($descBg, 0.7)) . '; padding: 5px; --descBorder: ' . esc_attr($descBg) . ';">
+                <p>' . esc_html($excerpt) . '</p>
+            </div>
+        ';
+
+            return $custom_output;
+        }
+    }
+    if (is_post_new($post->ID)) {
+        $custom_output = '
+        <div class="attar-custom-post-box-' . $is_rtl . '" style="--descBg:' . esc_attr(attar_lighten_hex_color('#f66151', 0.7)) . '; padding: 5px; --descBorder: ' . esc_attr('#f66151') . ';">
+            <p>' . esc_html($excerpt) . '</p>
+        </div>
+    ';
+
+        return $custom_output;
+    }
+    return $content;
 }
 
 function is_post_new($post_id)
@@ -111,48 +158,6 @@ function attar_lighten_hex_color($hex, $percent)
     return sprintf('#%02x%02x%02x', $r, $g, $b);
 }
 
-add_filter('the_content', 'custom_format_content_based_on_tags');
-
-function custom_format_content_based_on_tags($content)
-{
-    if (!$content)
-        return $content;
-    global $post;
-    $post_id = $post->ID;
-    if (is_admin() || is_singular() || !in_the_loop() || !is_main_query())
-        return $content;
-
-    $excerpt = has_excerpt($post_id) ? get_the_excerpt($post_id) : wp_trim_words(strip_tags($post->post_content), 3, '...');
-
-    $data = get_option('custom_schedule_data', []);
-    if (!is_array($data)) {
-        $data = [];
-    }
-    foreach ($data as $tag => $values) {
-        extract($values);
-        if (attar_has_current_tag($post->ID, $tag)) {
-            $custom_output = '
-            <div class="custom-post-box" style="background-color:' . esc_attr(attar_lighten_hex_color($descBg, 0.7)) . '; padding: 5px; border-left: 4px solid ' . esc_attr($descBg) . ';">
-                <p>' . esc_html($excerpt) . '</p>
-            </div>
-        ';
-
-            return $custom_output;
-        }
-    }
-    if (is_post_new($post->ID)) {
-        $custom_output = '
-        <div class="custom-post-box" style="background-color:' . esc_attr(attar_lighten_hex_color('#f66151', 0.7)) . '; padding: 5px; border-left: 4px solid ' . esc_attr('#f66151') . ';">
-            <p>' . esc_html($excerpt) . '</p>
-        </div>
-    ';
-
-        return $custom_output;
-    }
-    return $content;
-}
-
-// إدراج CSS مخصص
 add_action('wp_enqueue_scripts', 'attar_custom_enqueue_styles');
 
 function attar_custom_enqueue_styles()
@@ -182,15 +187,12 @@ function attar_save_schedule_data_callback()
 
         $existing_data = get_option('custom_schedule_data', []);
 
-        // تأكد أن الموجود مصفوفة
         if (!is_array($existing_data)) {
             $existing_data = [];
         }
 
-        // حدّث أو أضف البيانات تحت اسم الوسم
         $existing_data[$tag] = $data;
 
-        // خزّن البيانات من جديد
         update_option('custom_schedule_data', $existing_data);
 
         wp_send_json_success(['message' => 'تم الحفظ بنجاح']);
@@ -216,11 +218,4 @@ function attar_delete_schedula_data()
     } else {
         wp_send_json_error(['message' => 'العنصر غير موجود']);
     }
-}
-
-add_action('plugins_loaded', 'my_plugin_load_textdomain');
-
-function my_plugin_load_textdomain()
-{
-    load_plugin_textdomain('my-plugin-textdomain', false, dirname(plugin_basename(__FILE__)) . '/languages/');
 }

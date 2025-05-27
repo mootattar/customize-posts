@@ -49,7 +49,7 @@
       font-weight: bold;
     }
 
-    .attar-post-title-style::before {
+    .attar-post-title-style::after {
       content: attr(data-label);
       display: block;
       padding: 4px;
@@ -127,25 +127,20 @@
     let useDescBg = true;
 
     function attar_lighten_hex_color(hex, percent) {
-      // إزالة رمز #
       hex = hex.replace(/^#/, '');
 
-      // تحويل اللون الثلاثي إلى سداسي
       if (hex.length === 3) {
         hex = hex.split('').map(c => c + c).join('');
       }
 
-      // استخراج قيم RGB
       let r = parseInt(hex.substring(0, 2), 16);
       let g = parseInt(hex.substring(2, 4), 16);
       let b = parseInt(hex.substring(4, 6), 16);
 
-      // تفتيح اللون بالنسبة المحددة
       r = Math.round(r + (255 - r) * percent);
       g = Math.round(g + (255 - g) * percent);
       b = Math.round(b + (255 - b) * percent);
 
-      // تحويل القيم إلى HEX والتنسيق النهائي
       return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
     }
 
@@ -290,7 +285,7 @@
       const titleColor = document.getElementById('titleTextColor').value;
 
       if (!titleText || !tag) {
-        alert("<?php echo esc_js(__('يرجى تعبئة جميع الحقول.', 'customize_title_and_content_posts')); ?>");
+        alert("<?php echo esc_js(__('please fill all Fields!', 'customize_title_and_content_posts')); ?>");
         return;
       }
       sendDataToServer({ titleText, tag, titleBg, descBg, titleColor }); // send data to admin-ajax.php

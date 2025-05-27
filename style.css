@@ -1,17 +1,13 @@
-.common-post-content-style {
-  line-height: 1.8;
-  background-color: #f9f9f9;
-  padding: 15px;
-  border-left: 4px solid #0073aa;
-}
-.post-title-style {
+.attar-post-title-style-right,.attar-post-title-style-left {
   position: relative;
   font-size: 2rem;
   font-weight: bold;
 }
 
-.post-title-style::before {
+.attar-post-title-style-right::after {
   content: attr(data-label);
+  width: fit-content;
+  word-break: keep-all;
   display: block;
   padding: 4px;
   border-radius: 10px;
@@ -20,18 +16,43 @@
   margin-bottom: 2px;
   position: absolute;
   top: -1.5em;
-  right: -25px;
+  left: -25px;
+  color: var(--titleColor, #000);
+  background-color: var(--titleBg, #fff);
+}
+.attar-post-title-style-left::after {
+  content: attr(data-label);
+  width: fit-content;
+  word-break: keep-all;
+  display: block;
+  padding: 4px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 2px;
+  position: absolute;
+  top: -1.5em;
+  right : -25px;
   color: var(--titleColor, #000);
   background-color: var(--titleBg, #fff);
 }
 
-.custom-post-box {
+.attar-custom-post-box-right {
   transition: all 0.3s ease;
   border-radius: 8px;
   margin-bottom: 20px;
+  background-color: var(--descBg);
+  border-right: 4px solid var(--descBorder);
+}
+.attar-custom-post-box-left {
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  background-color: var(--descBg);
+  border-left: 4px solid var(--descBorder);
 }
 
-.custom-post-box h2 {
+.attar-custom-post-box h2 {
   margin-bottom: 10px;
   font-size: 1.5rem;
 }
