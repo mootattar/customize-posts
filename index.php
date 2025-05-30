@@ -16,13 +16,13 @@ function moot_attar_custom_posts_show_menu()
         __('custom posts', 'customize_title_and_content_posts'),
         'manage_options',
         'edit-title-content',
-        'moot_attar_custom_posts_show_content',
+        'attar_custom_posts_show_content',
         'dashicons-admin-generic',
         40
     );
 }
 
-function moot_attar_custom_posts_show_content()
+function attar_custom_posts_show_content()
 {
     include plugin_dir_path(__FILE__) . 'templates/custom-page-content.php';
 }
@@ -37,20 +37,22 @@ function my_custom_admin_styles($hook)
     wp_enqueue_style('my-custom-style', plugin_dir_url(__FILE__) . 'style.css');
 }
 
-function get_schedule_data_callback()
+function attar_get_schedule_tags_data_callback()
 {
-    $data = get_option('custom_schedule_data', []);
+    // $data = get_option('custom_schedule_data', []);
+    $data = get_option('attar_custom_posts_based_on_tags', []);
 
     if (!is_array($data)) {
         $data = [];
     }
 
-    wp_send_json_success(['data' => $data]);
+    // wp_send_json_success(['data' => $data]);
+    return $data;
 }
 
-add_filter('the_title', 'custom_format_title');
+add_filter('the_title', 'attar_custom_format_title');
 
-function custom_format_title($title)
+function attar_custom_format_title($title)
 {
     if (is_admin() || !is_main_query() || !in_the_loop() || is_singular())
         return $title;
@@ -59,19 +61,14 @@ function custom_format_title($title)
         $is_rtl = 'right';
     }
     global $post;
-    $data = get_option('custom_schedule_data', []);
-    if (!is_array($data)) {
-        $data = [];
-    }
+    $data = attar_get_schedule_tags_data_callback();
     foreach ($data as $tag => $values) {
         extract($values);
         if (attar_has_current_tag($post->ID, $tag)) {
             return '<span class="attar-post-title-style-' . $is_rtl . '" data-label="' . esc_attr($titleText) . '" style="--titleColor:' . esc_attr($titleColor) . '; --titleBg:' . esc_attr($titleBg) . ';">' . esc_html__($title, 'customize_title_and_content_posts') . '</span>';
         }
     }
-    if (is_post_new($post->ID))
-        return '<span class="attar-post-title-style-' . $is_rtl . '" data-label="' . esc_attr__($is_rtl === 'right' ? 'جديد' : 'NEW', 'customize_title_and_content_posts') . '" style="--titleColor:' . esc_attr('#ffffff') . '; --titleBg:' . esc_attr('#f66151') . ';">' . esc_html__($title, 'customize_title_and_content_posts') . '</span>';
-    return esc_html__($title, 'customize_title_and_content_posts');
+    return $title;
 }
 
 function attar_has_current_tag($post_id, $current_tag)
@@ -102,15 +99,12 @@ function attar_custom_format_content_based_on_tags($content)
 
     $excerpt = has_excerpt($post_id) ? get_the_excerpt($post_id) : wp_trim_words(strip_tags($post->post_content), 3, '...');
 
-    $data = get_option('custom_schedule_data', []);
-    if (!is_array($data)) {
-        $data = [];
-    }
+    $data = attar_get_schedule_tags_data_callback();
     foreach ($data as $tag => $values) {
         extract($values);
         if (attar_has_current_tag($post->ID, $tag)) {
             $custom_output = '
-            <div class="attar-custom-post-box-' . $is_rtl . '" style="--descBg:' . esc_attr(attar_lighten_hex_color($descBg, 0.7)) . '; padding: 5px; --descBorder: ' . esc_attr($descBg) . ';">
+            <div class="attar-custom-post-box-' . $is_rtl . '" style="--descBg:' . esc_attr(attar_custom_post_lighten_hex_color($descBg, 0.7)) . '; padding: 5px; --descBorder: ' . esc_attr($descBg) . ';">
                 <p>' . esc_html($excerpt) . '</p>
             </div>
         ';
@@ -118,29 +112,15 @@ function attar_custom_format_content_based_on_tags($content)
             return $custom_output;
         }
     }
-    if (is_post_new($post->ID)) {
-        $custom_output = '
-        <div class="attar-custom-post-box-' . $is_rtl . '" style="--descBg:' . esc_attr(attar_lighten_hex_color('#f66151', 0.7)) . '; padding: 5px; --descBorder: ' . esc_attr('#f66151') . ';">
-            <p>' . esc_html($excerpt) . '</p>
-        </div>
-    ';
 
-        return $custom_output;
-    }
     return $content;
 }
 
-function is_post_new($post_id)
+function attar_custom_post_lighten_hex_color($hex, $percent)
 {
-    $post_date = get_the_date('U', $post_id);
-    $now = current_time('timestamp');
-    $days = 3 * DAY_IN_SECONDS;
-
-    return ($now - $post_date) < $days;
-}
-
-function attar_lighten_hex_color($hex, $percent)
-{
+    if ($hex === 'transparent') {
+        return 'transparent';
+    }
     $hex = ltrim($hex, '#');
 
     if (strlen($hex) === 3) {
@@ -158,11 +138,11 @@ function attar_lighten_hex_color($hex, $percent)
     return sprintf('#%02x%02x%02x', $r, $g, $b);
 }
 
-add_action('wp_enqueue_scripts', 'attar_custom_enqueue_styles');
+add_action('wp_enqueue_scripts', 'attar_custom_posts_enqueue_styles');
 
-function attar_custom_enqueue_styles()
+function attar_custom_posts_enqueue_styles()
 {
-    wp_enqueue_style('custom-plugin-style', plugin_dir_url(__FILE__) . 'style.css');
+    wp_enqueue_style('attar-custom-posts-enqueue-styles', plugin_dir_url(__FILE__) . 'style.css');
 }
 
 add_action('wp_ajax_attar_save_schedula_data', 'attar_save_schedule_data_callback');
@@ -177,15 +157,13 @@ function attar_save_schedule_data_callback()
         isset($_POST['titleColor'])
     ) {
         $tag = sanitize_text_field($_POST['tag']);
-
         $data = [
             'titleText' => sanitize_text_field($_POST['titleText']),
-            'titleBg' => sanitize_hex_color($_POST['titleBg']),
-            'descBg' => sanitize_hex_color($_POST['descBg']),
+            'titleBg' => $_POST['titleBg'] !== 'transparent' ? sanitize_hex_color($_POST['titleBg']) : $_POST['titleBg'],
+            'descBg' => $_POST['descBg'] !== 'transparent' ? sanitize_hex_color($_POST['descBg']) : $_POST['descBg'],
             'titleColor' => sanitize_hex_color($_POST['titleColor']),
         ];
-
-        $existing_data = get_option('custom_schedule_data', []);
+        $existing_data = get_option('attar_custom_posts_based_on_tags', []);
 
         if (!is_array($existing_data)) {
             $existing_data = [];
@@ -193,11 +171,11 @@ function attar_save_schedule_data_callback()
 
         $existing_data[$tag] = $data;
 
-        update_option('custom_schedule_data', $existing_data);
+        update_option('attar_custom_posts_based_on_tags', $existing_data);
 
-        wp_send_json_success(['message' => 'تم الحفظ بنجاح']);
+        wp_send_json_success(['message' => $data]);
     } else {
-        wp_send_json_error(['message' => 'بيانات ناقصة']);
+        wp_send_json_error(['message' => 'no data', $data]);
     }
 
     wp_die();
@@ -208,11 +186,13 @@ add_action('wp_ajax_attar_delete_schedula_data', 'attar_delete_schedula_data');
 function attar_delete_schedula_data()
 {
     $tag = sanitize_text_field($_POST['tag']);
-    $data = get_option('custom_schedule_data', []);
+    // $data = get_option('custom_schedule_data', []);
+    $data = get_option('attar_custom_posts_based_on_tags', []);
 
     if (isset($data[$tag])) {
         unset($data[$tag]);
-        update_option('custom_schedule_data', $data);
+        // update_option('custom_schedule_data', $data);
+        update_option('attar_custom_posts_based_on_tags', $data);
 
         wp_send_json_success(['message' => 'تم الحذف بنجاح', 'updatedData' => $data]);
     } else {

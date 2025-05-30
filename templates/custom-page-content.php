@@ -47,7 +47,7 @@
       position: relative;
       font-size: 2rem;
       font-weight: bold;
-    }
+      }
 
     .attar-post-title-style::after {
       content: attr(data-label);
@@ -62,12 +62,40 @@
       right: -25px;
       color: var(--titleColor, #000);
       background-color: var(--titleBg, #fff);
+      transition: all 0.3s ease;
     }
-
+    html[dir="rtl"] .attar-post-title-style::after{
+        content: attr(data-label);
+        display: block;
+        padding: 4px;
+        border-radius: 10px;
+        font-size: 12px;
+        font-weight: bold;
+        margin-bottom: 2px;
+        position: absolute;
+        top: -2em;
+        left: -25px;
+        right:auto;
+        color: var(--titleColor, #000);
+        background-color: var(--titleBg, #fff);
+        transition: all 0.3s ease;
+    }
     .attar-custom-post-box {
       transition: all 0.3s ease;
       border-radius: 8px;
       margin-bottom: 20px;
+      padding:5px;
+      border-left: 4px solid var(--descBorder);
+      background-color: var(--descBg);
+    }
+    html[dir="rtl"] .attar-custom-post-box {
+      transition: all 0.3s ease;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      padding:5px;
+      border-right: 4px solid var(--descBorder);
+      border-left:0;
+      background-color: var(--descBg);
     }
 
     .attar-custom-post-box h2 {
@@ -101,10 +129,10 @@
 
   <button id="add_to_schedule"><?php _e('add to schedule', 'customize_title_and_content_posts'); ?></button>
   <div id="attar_post_preview" style=" border:1px solid black ; border-radius:10px ;padding:40px;width:50%;margin:50px;display:none;">			
-    <h2 class="wp-block-post-title has-x-large-font-size"><span class="attar-post-title-style" data-label="" style="--titleColor:#ffffff; --titleBg:transparent;">The title</span></a></h2>
+    <h2 class="wp-block-post-title has-x-large-font-size"><span class="attar-post-title-style" data-label="" style="--titleColor:#ffffff; --titleBg:transparent;"><?php _e('The title', 'customize_title_and_content_posts'); ?></span></a></h2>
     <div class="entry-content alignfull wp-block-post-content has-medium-font-size has-global-padding is-layout-constrained wp-block-post-content-is-layout-constrained">
-      <div class="attar-custom-post-box" style="background-color:transparent; padding: 5px; border-left: 4px solid transparent;">
-        <p>the content is here!</p>
+      <div class="attar-custom-post-box">
+        <p><?php _e('the content is here!', 'customize_title_and_content_posts'); ?></p>
       </div>
     </div>
   </div>
@@ -121,11 +149,19 @@
   </table>
 
   <script>
+    const titleBg = document.getElementById('titleBgColor');
+    const descBg = document.getElementById('descBgColor');
     var ajaxurl = "<?php echo admin_url('admin-ajax.php'); ?>";
-    var scheduleDataFromPHP = <?php echo json_encode(get_option('custom_schedule_data', [])); ?>;
+    var scheduleDataFromPHP = <?php echo json_encode(get_option('attar_custom_posts_based_on_tags', [])); ?>;
     let useTitleBg = true;
     let useDescBg = true;
-
+    
+    descBg.addEventListener('change', function (e) {
+      useDescBg = true;
+    });
+    titleBg.addEventListener('change', function (e) {
+      useTitleBg = true;
+    });
     function attar_lighten_hex_color(hex, percent) {
       hex = hex.replace(/^#/, '');
 
@@ -186,8 +222,8 @@
       titleElement.style.setProperty('--titleBg', current_tag.titleBg || '#000000');
 
       const contentElement = show_post.querySelector('.attar-custom-post-box');
-      contentElement.style.borderLeft = `4px solid ${current_tag.descBg || 'transparent'}`;
-      contentElement.style.backgroundColor = attar_lighten_hex_color(current_tag.descBg,0.7) || 'transparent';
+      contentElement.style.setProperty('--descBorder',current_tag.descBg||'transparent')
+      contentElement.style.setProperty('--descBg',attar_lighten_hex_color(current_tag.descBg,0.7) || 'transparent');
     }
 
     function fillTableWithData(data) {
@@ -280,8 +316,8 @@
     function addToTable() {
       const titleText = document.getElementById('titleText').value.trim();
       const tag = document.getElementById('tag').value.trim();
-      const titleBg = document.getElementById('titleBgColor').value;
-      const descBg = document.getElementById('descBgColor').value;
+      const titleBg = useTitleBg ? document.getElementById('titleBgColor').value : 'transparent';
+      const descBg = useDescBg ? document.getElementById('descBgColor').value : 'transparent';
       const titleColor = document.getElementById('titleTextColor').value;
 
       if (!titleText || !tag) {
@@ -295,12 +331,12 @@
 
       const titleCell = document.createElement('td');
       titleCell.textContent = titleText;
-      titleCell.style.backgroundColor = titleBg;
+      titleCell.style.backgroundColor = useTitleBg ? titleBg: 'transparent';
       titleCell.style.color = titleColor;
 
       const descCell = document.createElement('td');
       descCell.textContent = '—'; // no content
-      descCell.style.backgroundColor = descBg;
+      descCell.style.backgroundColor =useDescBg ? descBg: 'transparent';
 
       const tagCell = document.createElement('td');
       tagCell.textContent = tag;

@@ -18,7 +18,7 @@
   top: -1.5em;
   left: -25px;
   color: var(--titleColor, #000);
-  background-color: var(--titleBg, #fff);
+  background-color: var(--titleBg, transparent);
 }
 .attar-post-title-style-left::after {
   content: attr(data-label);
@@ -34,7 +34,7 @@
   top: -1.5em;
   right : -25px;
   color: var(--titleColor, #000);
-  background-color: var(--titleBg, #fff);
+  background-color: var(--titleBg, transparent);
 }
 
 .attar-custom-post-box-right {
@@ -42,14 +42,14 @@
   border-radius: 8px;
   margin-bottom: 20px;
   background-color: var(--descBg);
-  border-right: 4px solid var(--descBorder);
+  border-right: 4px solid var(--descBorder,transparent);
 }
 .attar-custom-post-box-left {
   transition: all 0.3s ease;
   border-radius: 8px;
   margin-bottom: 20px;
-  background-color: var(--descBg);
-  border-left: 4px solid var(--descBorder);
+  background-color: var(--descBg,transparent);
+  border-left: 4px solid var(--descBorder, transparent);
 }
 
 .attar-custom-post-box h2 {
