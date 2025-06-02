@@ -1,3 +1,48 @@
+.wrap h1 {
+  color: #0073aa;
+  font-size: 32px;
+}
+.wrap p {
+  font-size: 18px;
+}
+.form-group {
+  margin-bottom: 10px;
+}
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+input[type="text"],
+input[type="color"] {
+  width: 50%;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+button {
+  padding: 10px 15px;
+  background-color: #0073aa;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+table {
+  margin-top: 20px;
+  width: 100%;
+  border-collapse: collapse;
+}
+table,
+th,
+td {
+  border: 1px solid #ccc;
+}
+th,
+td {
+  padding: 10px;
+  text-align: center;
+}
 .attar-post-title-style {
   position: relative;
   font-size: 2rem;
@@ -6,8 +51,6 @@
 
 .attar-post-title-style::after {
   content: attr(data-label);
-  width: fit-content;
-  word-break: keep-all;
   display: block;
   padding: 4px;
   border-radius: 10px;
@@ -17,14 +60,12 @@
   position: absolute;
   top: -1.5em;
   right: -25px;
-  left: auto;
   color: var(--titleColor, #000);
-  background-color: var(--titleBg, transparent);
+  background-color: var(--titleBg, #fff);
+  transition: all 0.3s ease;
 }
 html[dir="rtl"] .attar-post-title-style::after {
   content: attr(data-label);
-  width: fit-content;
-  word-break: keep-all;
   display: block;
   padding: 4px;
   border-radius: 10px;
@@ -32,27 +73,29 @@ html[dir="rtl"] .attar-post-title-style::after {
   font-weight: bold;
   margin-bottom: 2px;
   position: absolute;
-  top: -1.5em;
+  top: -2em;
   left: -25px;
   right: auto;
   color: var(--titleColor, #000);
-  background-color: var(--titleBg, transparent);
+  background-color: var(--titleBg, #fff);
+  transition: all 0.3s ease;
 }
-
 .attar-custom-post-box {
   transition: all 0.3s ease;
   border-radius: 8px;
   margin-bottom: 20px;
-  background-color: var(--descBg, transparent);
-  border-left: 4px solid var(--descBorder, transparent);
+  padding: 5px;
+  border-left: 4px solid var(--descBorder);
+  background-color: var(--descBg);
 }
-
 html[dir="rtl"] .attar-custom-post-box {
   transition: all 0.3s ease;
   border-radius: 8px;
   margin-bottom: 20px;
+  padding: 5px;
+  border-right: 4px solid var(--descBorder);
+  border-left: 0;
   background-color: var(--descBg);
-  border-right: 4px solid var(--descBorder, transparent);
 }
 
 .attar-custom-post-box h2 {
