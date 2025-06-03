@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Plugin Name: customize posts label
+ * Plugin Name: post label styler
  * Description: you can add & customize label to you posts depend on the post tag | customize text & colors
  * Version: 1.0
  * Author: Abdulrahman AL-Attar
- * Text Domain: customize_posts_label
+ * Text Domain: post_label_styler
  * License: GPL2
  */
 foreach (['menu', 'filters', 'ajax', 'helpers'] as $file) {

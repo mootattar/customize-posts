@@ -14,7 +14,7 @@ function attar_custom_format_title($title)
     foreach ($data as $tag => $values) {
         extract($values);
         if (attar_has_current_tag($post->ID, $tag)) {
-            return '<span class="attar-post-title-style" data-label="' . esc_attr($titleText) . '" style="--titleColor:' . esc_attr($titleColor) . '; --titleBg:' . esc_attr($titleBg) . ';">' . esc_html__($title, 'customize_posts_label') . '</span>';
+            return '<span class="attar-post-title-style" data-label="' . esc_attr($titleText) . '" style="--titleColor:' . esc_attr($titleColor) . '; --titleBg:' . esc_attr($titleBg) . ';">' . esc_html__($title, 'post_label_styler') . '</span>';
         }
     }
 
